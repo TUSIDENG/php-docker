@@ -3,4 +3,5 @@ temp/
 share/
 dockerfiles/
 .vscode/
+.agents/
 *.log
