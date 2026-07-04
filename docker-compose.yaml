@@ -1,11 +1,98 @@
 version: '3.8'
 
 services:
+  php70-fpm:
+    build:
+      context: ./dockerfiles/php70
+      args:
+        PHP_MODE: ${PHP70_MODE:-fpm}
+    container_name: php70-fpm
+    volumes:
+      - ${PHP70_DIR:-./share/php70}:/var/www/html
+    environment:
+      - PHP_MODE=${PHP70_MODE:-fpm}
+    networks:
+      - php-docker
+    restart: unless-stopped
+    expose:
+      - "9000"
+
+  php71-fpm:
+    build:
+      context: ./dockerfiles/php71
+      args:
+        PHP_MODE: ${PHP71_MODE:-fpm}
+    container_name: php71-fpm
+    volumes:
+      - ${PHP71_DIR:-./share/php71}:/var/www/html
+    environment:
+      - PHP_MODE=${PHP71_MODE:-fpm}
+    networks:
+      - php-docker
+    restart: unless-stopped
+    expose:
+      - "9000"
+
+  nginx:
+    build: ./dockerfiles/nginx
+    container_name: nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ${NGINX_HTML_DIR:-./share/nginx/html}:/var/www/html
+      - ${NGINX_LOG_DIR:-./share/nginx/logs}:/var/log/nginx
+      - ${NGINX_CONF_DIR:-./share/nginx/conf}:/etc/nginx/conf.d
+    networks:
+      - php-docker
+    restart: unless-stopped
+    depends_on:
+      - php70-fpm
+      - php71-fpm
+
+  mysql:
+    image: mysql:5.7
+    container_name: mysql
+    ports:
+      - "3306:3306"
+    volumes:
+      - ${SHARE_DIR:-./share}/mysql/data:/var/lib/mysql
+      - ${SHARE_DIR:-./share}/mysql/logs:/var/log/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-default}
+      MYSQL_USER: ${MYSQL_USER:-dev}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-dev}
+    networks:
+      - php-docker
+    restart: unless-stopped
+
+  redis:
+    image: redis:5-alpine
+    container_name: redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - ${SHARE_DIR:-./share}/redis/data:/data
+    environment:
+      REDIS_PASSWORD: ${REDIS_PASSWORD:-}
+    networks:
+      - php-docker
+    restart: unless-stopped
+    command: >
+      sh -c "if [ -n \"$REDIS_PASSWORD\" ]; then
+               redis-server --appendonly yes --requirepass \"$REDIS_PASSWORD\";
+             else
+               redis-server --appendonly yes;
+             fi"
+
   elasticvue:
     image: cars10/elasticvue
     container_name: elasticvue
     ports:
       - "8080:8080"
+    networks:
+      - php-docker
     restart: unless-stopped
 
   kibana:
@@ -13,4 +100,10 @@ services:
     container_name: kibana
     ports:
       - "5601:5601"
+    networks:
+      - php-docker
     restart: unless-stopped
+
+networks:
+  php-docker:
+    driver: bridge
