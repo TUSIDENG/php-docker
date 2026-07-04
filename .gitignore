@@ -1,2 +1,6 @@
 temp/
 .env
+share/
+dockerfiles/
+.vscode/
+*.log

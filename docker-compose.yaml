@@ -3,7 +3,7 @@ version: '3.8'
 services:
   php70-fpm:
     build:
-      context: ./dockerfiles/php70
+      context: ./services/php/php70
       args:
         PHP_MODE: ${PHP70_MODE:-fpm}
     container_name: php70-fpm
@@ -19,7 +19,7 @@ services:
 
   php71-fpm:
     build:
-      context: ./dockerfiles/php71
+      context: ./services/php/php71
       args:
         PHP_MODE: ${PHP71_MODE:-fpm}
     container_name: php71-fpm
@@ -33,8 +33,24 @@ services:
     expose:
       - "9000"
 
+  php80-fpm:
+    build:
+      context: ./services/php/php80
+      args:
+        PHP_MODE: ${PHP80_MODE:-fpm}
+    container_name: php80-fpm
+    volumes:
+      - ${PHP80_DIR:-./share/php80}:/var/www/html
+    environment:
+      - PHP_MODE=${PHP80_MODE:-fpm}
+    networks:
+      - php-docker
+    restart: unless-stopped
+    expose:
+      - "9000"
+
   nginx:
-    build: ./dockerfiles/nginx
+    build: ./services/common/nginx
     container_name: nginx
     ports:
       - "80:80"
@@ -49,15 +65,16 @@ services:
     depends_on:
       - php70-fpm
       - php71-fpm
+      - php80-fpm
 
   mysql:
-    image: mysql:5.7
+    image: mysql:${MYSQL_VERSION:-5.7}
     container_name: mysql
     ports:
       - "3306:3306"
     volumes:
-      - ${SHARE_DIR:-./share}/mysql/data:/var/lib/mysql
-      - ${SHARE_DIR:-./share}/mysql/logs:/var/log/mysql
+      - ${MYSQL_DATA_DIR:-./share/mysql/data}:/var/lib/mysql
+      - ${MYSQL_LOG_DIR:-./share/mysql/logs}:/var/log/mysql
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root}
       MYSQL_DATABASE: ${MYSQL_DATABASE:-default}
@@ -68,12 +85,12 @@ services:
     restart: unless-stopped
 
   redis:
-    image: redis:5-alpine
+    image: redis:${REDIS_VERSION:-5-alpine}
     container_name: redis
     ports:
       - "6379:6379"
     volumes:
-      - ${SHARE_DIR:-./share}/redis/data:/data
+      - ${REDIS_DATA_DIR:-./share/redis/data}:/data
     environment:
       REDIS_PASSWORD: ${REDIS_PASSWORD:-}
     networks:
