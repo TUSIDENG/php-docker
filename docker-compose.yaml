@@ -64,9 +64,6 @@ services:
     restart: unless-stopped
     depends_on:
       - php70-fpm
-      - php71-fpm
-      - php80-fpm
-
   mysql:
     image: mysql:${MYSQL_VERSION:-5.7}
     container_name: mysql

@@ -2,7 +2,13 @@ FROM php:7.0-fpm
 
 ARG PHP_MODE=fpm
 
-RUN apt-get update && apt-get install -y \
+RUN rm -rf /var/lib/apt/lists/* \
+    && echo "deb http://archive.debian.org/debian buster main contrib non-free" > /etc/apt/sources.list \
+    && echo "deb http://archive.debian.org/debian buster-updates main contrib non-free" >> /etc/apt/sources.list \
+    && echo "deb http://archive.debian.org/debian-security buster/updates main contrib non-free" >> /etc/apt/sources.list \
+    && apt-get update \
+    && apt-get -y --allow-unauthenticated dist-upgrade \
+    && apt-get install -y --allow-unauthenticated \
     git \
     unzip \
     vim \

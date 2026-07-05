@@ -2,7 +2,9 @@ FROM php:8.0-fpm
 
 ARG PHP_MODE=fpm
 
-RUN apt-get update && apt-get install -y \
+RUN sed -i 's/deb.debian.org/mirrors.aliyun.com/g' /etc/apt/sources.list \
+    && sed -i 's/security.debian.org/mirrors.aliyun.com/g' /etc/apt/sources.list \
+    && apt-get update && apt-get install -y \
     git \
     unzip \
     vim \
