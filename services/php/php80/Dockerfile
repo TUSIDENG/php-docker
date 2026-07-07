@@ -38,7 +38,7 @@ RUN pecl install redis-5.3.7 \
     && docker-php-ext-enable redis memcached \
     && mkdir -p /var/log/php
 
-COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/bin --filename=composer
 
 RUN if [ "$PHP_MODE" = "fpm" ]; then \
         pecl install xdebug-3.3.1 \

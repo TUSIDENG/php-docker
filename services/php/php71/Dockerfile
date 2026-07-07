@@ -3,10 +3,10 @@ FROM php:7.1-fpm
 ARG PHP_MODE=fpm
 
 RUN rm -rf /var/lib/apt/lists/* \
-    && echo "deb http://archive.debian.org/debian buster main contrib non-free" > /etc/apt/sources.list \
-    && echo "deb http://archive.debian.org/debian buster-updates main contrib non-free" >> /etc/apt/sources.list \
-    && echo "deb http://archive.debian.org/debian-security buster/updates main contrib non-free" >> /etc/apt/sources.list \
-    && apt-get update \
+    && echo "deb http://mirrors.aliyun.com/debian-archive/debian/ buster main contrib non-free" > /etc/apt/sources.list \
+    && echo "deb http://mirrors.aliyun.com/debian-archive/debian/ buster-updates main contrib non-free" >> /etc/apt/sources.list \
+    && echo "deb http://mirrors.aliyun.com/debian-archive/debian-security/ buster/updates main contrib non-free" >> /etc/apt/sources.list \
+    && apt-get update -o Acquire::Check-Valid-Until=false \
     && apt-get -y --allow-unauthenticated dist-upgrade \
     && apt-get install -y --allow-unauthenticated \
     git \
@@ -42,7 +42,8 @@ RUN pecl install redis-4.3.0 \
     && docker-php-ext-enable redis memcached \
     && mkdir -p /var/log/php
 
-COPY --from=composer:1.10 /usr/bin/composer /usr/bin/composer
+RUN curl -sS https://getcomposer.org/download/1.10.26/composer.phar -o /usr/bin/composer \
+    && chmod +x /usr/bin/composer
 
 RUN if [ "$PHP_MODE" = "fpm" ]; then \
         pecl install xdebug-2.9.8 \
