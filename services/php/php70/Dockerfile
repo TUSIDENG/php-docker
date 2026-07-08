@@ -3,10 +3,9 @@ FROM php:7.0-fpm
 ARG PHP_MODE=fpm
 
 RUN rm -rf /var/lib/apt/lists/* \
-    && echo "deb http://mirrors.aliyun.com/debian-archive/debian/ buster main contrib non-free" > /etc/apt/sources.list \
-    && echo "deb http://mirrors.aliyun.com/debian-archive/debian/ buster-updates main contrib non-free" >> /etc/apt/sources.list \
-    && echo "deb http://mirrors.aliyun.com/debian-archive/debian-security/ buster/updates main contrib non-free" >> /etc/apt/sources.list \
-    && apt-get update -o Acquire::Check-Valid-Until=false \
+    && echo "deb http://mirrors.aliyun.com/debian-archive/debian/ stretch main contrib non-free" > /etc/apt/sources.list \
+    && echo "deb http://mirrors.aliyun.com/debian-archive/debian-security/ stretch/updates main contrib non-free" >> /etc/apt/sources.list \
+    && apt-get update -o Acquire::Check-Valid-Until=false --allow-unauthenticated \
     && apt-get -y --allow-unauthenticated dist-upgrade \
     && apt-get install -y --allow-unauthenticated \
     git \
@@ -46,7 +45,7 @@ RUN curl -sS https://getcomposer.org/download/1.10.26/composer.phar -o /usr/bin/
     && chmod +x /usr/bin/composer
 
 RUN if [ "$PHP_MODE" = "fpm" ]; then \
-        pecl install xdebug-2.9.8 \
+        pecl install xdebug-2.7.2 \
         && docker-php-ext-enable xdebug; \
     elif [ "$PHP_MODE" = "swoole" ]; then \
         pecl install swoole-4.4.23 \
