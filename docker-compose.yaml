@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   php70-fpm:
     build:
@@ -8,7 +6,9 @@ services:
         PHP_MODE: ${PHP70_MODE:-fpm}
     container_name: php70-fpm
     volumes:
-      - ${PHP70_DIR:-./share/php70}:/var/www/html
+      - ${CODE_DIR:-../}:/var/www/html
+      - ./services/php/php70/php.ini:/usr/local/etc/php/php.ini
+      - ./services/php/php70/www.conf:/usr/local/etc/php-fpm.d/www.conf
     environment:
       - PHP_MODE=${PHP70_MODE:-fpm}
     networks:
@@ -24,7 +24,9 @@ services:
         PHP_MODE: ${PHP71_MODE:-fpm}
     container_name: php71-fpm
     volumes:
-      - ${PHP71_DIR:-./share/php71}:/var/www/html
+      - ${CODE_DIR:-../}:/var/www/html
+      - ./services/php/php71/php.ini:/usr/local/etc/php/php.ini
+      - ./services/php/php71/www.conf:/usr/local/etc/php-fpm.d/www.conf
     environment:
       - PHP_MODE=${PHP71_MODE:-fpm}
     networks:
@@ -40,7 +42,9 @@ services:
         PHP_MODE: ${PHP80_MODE:-fpm}
     container_name: php80-fpm
     volumes:
-      - ${PHP80_DIR:-./share/php80}:/var/www/html
+      - ${CODE_DIR:-../}:/var/www/html
+      - ./services/php/php80/php.ini:/usr/local/etc/php/php.ini
+      - ./services/php/php80/www.conf:/usr/local/etc/php-fpm.d/www.conf
     environment:
       - PHP_MODE=${PHP80_MODE:-fpm}
     networks:
@@ -56,22 +60,23 @@ services:
       - "80:80"
       - "443:443"
     volumes:
-      - ${NGINX_HTML_DIR:-./share/nginx/html}:/var/www/html
-      - ${NGINX_LOG_DIR:-./share/nginx/logs}:/var/log/nginx
-      - ${NGINX_CONF_DIR:-./share/nginx/conf}:/etc/nginx/conf.d
+      - ${CODE_DIR:-../}:/var/www/html
+      - ./services/common/nginx/logs:/var/log/nginx
+      - ./services/common/nginx/conf.d:/etc/nginx/conf.d
     networks:
       - php-docker
     restart: unless-stopped
     depends_on:
       - php70-fpm
+
   mysql:
     image: mysql:${MYSQL_VERSION:-5.7}
     container_name: mysql
     ports:
       - "3306:3306"
     volumes:
-      - ${MYSQL_DATA_DIR:-./share/mysql/data}:/var/lib/mysql
-      - ${MYSQL_LOG_DIR:-./share/mysql/logs}:/var/log/mysql
+      - ./services/common/mysql/data:/var/lib/mysql
+      - ./services/common/mysql/logs:/var/log/mysql
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root}
       MYSQL_DATABASE: ${MYSQL_DATABASE:-default}
@@ -87,7 +92,7 @@ services:
     ports:
       - "6379:6379"
     volumes:
-      - ${REDIS_DATA_DIR:-./share/redis/data}:/data
+      - ./services/common/redis/data:/data
     environment:
       REDIS_PASSWORD: ${REDIS_PASSWORD:-}
     networks:
