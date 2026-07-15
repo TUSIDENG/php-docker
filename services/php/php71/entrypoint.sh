@@ -10,5 +10,5 @@ else
     cp /tmp/zz-xdebug.ini /usr/local/etc/php/conf.d/zz-xdebug.ini
     rm -f /usr/local/etc/php/conf.d/zz-yasd.ini 2>/dev/null
     echo "Starting PHP-FPM..."
-    exec php-fpm
+    exec php-fpm --allow-to-run-as-root
 fi
