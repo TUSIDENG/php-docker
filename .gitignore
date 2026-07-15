@@ -5,3 +5,6 @@ dockerfiles/
 .vscode/
 .agents/
 *.log
+services/common/nginx/conf.d/*.conf
+!services/common/nginx/conf.d/default.conf
+!services/common/nginx/conf.d/php71.conf
