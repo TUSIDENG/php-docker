@@ -64,7 +64,9 @@ services:
       - ./services/common/nginx/logs:/var/log/nginx
       - ./services/common/nginx/conf.d:/etc/nginx/conf.d
     networks:
-      - php-docker
+      php-docker:
+        aliases: # nginx 在网络内的域名别名，供 php-fpm 等容器互相访问应用
+          - example.local
     restart: unless-stopped
     depends_on:
       - php71-fpm
@@ -94,7 +96,7 @@ services:
     volumes:
       - ./services/common/redis/data:/data
     environment:
-      REDIS_PASSWORD: ${REDIS_PASSWORD:-}
+      REDIS_PASSWORD: ${REDIS_PASSWORD:-123456}
     networks:
       - php-docker
     restart: unless-stopped
