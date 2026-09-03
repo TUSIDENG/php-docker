@@ -35,6 +35,21 @@ services:
     expose:
       - "9000"
 
+  php71-swoole:
+    build: ./services/php/php71-swoole
+    container_name: php71-swoole
+    volumes:
+      - ${CODE_DIR:-../}:/var/www/html
+      - ./services/php/php71-swoole/php.ini:/usr/local/etc/php/php.ini
+    environment:
+      - SWOOLE_SCRIPT=${SWOOLE_SCRIPT:-}
+    working_dir: /var/www/html
+    networks:
+      - php-docker
+    restart: unless-stopped
+    ports:
+      - "${SWOOLE_PORT:-8888}:8888"
+
   php80-fpm:
     build:
       context: ./services/php/php80
